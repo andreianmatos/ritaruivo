@@ -24,7 +24,7 @@
         -webkit-tap-highlight-color: transparent;
       }
 
-      /* Full “canvas”: viewport is the frame; clip overflow; laranja nos vãos */
+      /* Viewport = frame; vídeo enche sempre (cover); laranja só antes de carregar */
       .stage {
         position: fixed;
         inset: 0;
@@ -35,16 +35,14 @@
         background: #ff7900;
       }
 
-      /* Área útil do vídeo (normal ou rodada) */
       .stage__inner {
         position: absolute;
         inset: 0;
       }
 
       /*
-        Ecrã mais alto que largo + vídeo horizontal: roda 90° para o “lado largo”
-        do vídeo alinhar com o eixo longo do telemóvel — melhor contain, ainda
-        sem cortar o frame (só fica “de lado” em relação ao ficheiro).
+        Tall screen + landscape master: rotate 90° so the long edge of the
+        phone matches the video; video still uses cover (full bleed, crop).
       */
       .stage--rotated .stage__inner {
         inset: auto;
@@ -58,8 +56,22 @@
         transform-origin: center center;
       }
 
+      /* Wide screen + portrait master: same idea, opposite rotation */
+      .stage--rotated-ccw .stage__inner {
+        inset: auto;
+        width: 100vh;
+        height: 100vw;
+        left: 50%;
+        top: 50%;
+        margin-left: -50vh;
+        margin-top: -50vw;
+        transform: rotate(-90deg);
+        transform-origin: center center;
+      }
+
       @supports (height: 100dvh) {
-        .stage--rotated .stage__inner {
+        .stage--rotated .stage__inner,
+        .stage--rotated-ccw .stage__inner {
           width: 100dvh;
           height: 100dvw;
           margin-left: -50dvh;
@@ -67,14 +79,13 @@
         }
       }
 
-      /* Sempre a ver o vídeo inteiro: contain + laranja onde sobra */
       video {
         display: block;
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
         object-position: center;
       }
     </style>
@@ -84,7 +95,7 @@
       <div class="stage__inner">
         <video
           id="portfolio"
-          src="portfolio.mp4"
+          src="portfolio.mov"
           autoplay
           muted
           loop
@@ -113,8 +124,14 @@
           var ih = v.videoHeight;
           if (!iw || !ih || !vw || !vh) return;
           var tallScreen = vh > vw;
+          var wideScreen = vw > vh;
           var landscapeVideo = iw > ih;
+          var portraitVideo = iw < ih;
           stage.classList.toggle("stage--rotated", tallScreen && landscapeVideo);
+          stage.classList.toggle(
+            "stage--rotated-ccw",
+            wideScreen && portraitVideo
+          );
         }
 
         function scheduleRotateFit() {
