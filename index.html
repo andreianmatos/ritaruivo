@@ -131,6 +131,11 @@
         visibility: hidden;
       }
 
+      /* Fade mais curto em cada volta do vídeo */
+      .stage__stardust.is-loop {
+        transition: opacity 0.85s ease-in-out, visibility 0s linear 0.85s;
+      }
+
       .stage__stardust::before,
       .stage__stardust::after {
         content: "";
@@ -256,12 +261,12 @@
   <body>
     <div class="stage" id="stage">
       <div class="stage__inner">
+        <!-- R2 (alternativa): https://pub-3b011c7ca5eb4317a6f3513a80528592.r2.dev/portfolio-faststart.mp4 -->
         <video
           id="portfolio"
-          src="https://pub-3b011c7ca5eb4317a6f3513a80528592.r2.dev/portfolio-faststart.mp4"
+          src="portfoliocompress.mp4"
           autoplay
           muted
-          loop
           playsinline
           preload="auto"
         ></video>
@@ -278,6 +283,9 @@
         var stage = document.getElementById("stage");
         var stardust = document.getElementById("stardust");
         var resizeTimer;
+        var isFirstPlay = true;
+        var loopStardustArmed = false;
+        var LOOP_STARDUST_LEAD = 0.9;
 
         function tryPlay() {
           var p = v.play();
@@ -286,11 +294,33 @@
           }
         }
 
-        function hideStardust() {
-          if (stardust) stardust.classList.add("is-hidden");
-        }
+        v.addEventListener("playing", function () {
+          if (!stardust) return;
+          if (isFirstPlay) {
+            isFirstPlay = false;
+            stardust.classList.remove("is-loop");
+            loopStardustArmed = true;
+          } else {
+            stardust.classList.add("is-loop");
+          }
+          stardust.classList.add("is-hidden");
+        });
 
-        v.addEventListener("playing", hideStardust, { once: true });
+        v.addEventListener("timeupdate", function () {
+          if (!stardust || isFirstPlay || !v.duration) return;
+          var left = v.duration - v.currentTime;
+          if (left <= LOOP_STARDUST_LEAD && loopStardustArmed) {
+            loopStardustArmed = false;
+            stardust.classList.add("is-loop");
+            stardust.classList.remove("is-hidden");
+          }
+        });
+
+        v.addEventListener("ended", function () {
+          loopStardustArmed = true;
+          v.currentTime = 0;
+          tryPlay();
+        });
 
         function updateRotateFit() {
           var vw = window.innerWidth;
