@@ -95,12 +95,12 @@
       <div class="stage__inner">
         <video
           id="portfolio"
-          src="https://pub-3b011c7ca5eb4317a6f3513a80528592.r2.dev/portfolio.mp4"
+          src="https://pub-3b011c7ca5eb4317a6f3513a80528592.r2.dev/portfolio-faststart.mp4"
           autoplay
           muted
           loop
           playsinline
-          preload="auto"
+          preload="metadata"
         ></video>
       </div>
     </div>
@@ -109,6 +109,18 @@
         var v = document.getElementById("portfolio");
         var stage = document.getElementById("stage");
         var resizeTimer;
+        var mobilePreloadMq = window.matchMedia("(max-width: 768px)");
+
+        function syncVideoPreload() {
+          v.preload = mobilePreloadMq.matches ? "metadata" : "auto";
+        }
+
+        syncVideoPreload();
+        if (typeof mobilePreloadMq.addEventListener === "function") {
+          mobilePreloadMq.addEventListener("change", syncVideoPreload);
+        } else if (typeof mobilePreloadMq.addListener === "function") {
+          mobilePreloadMq.addListener(syncVideoPreload);
+        }
 
         function tryPlay() {
           var p = v.play();
@@ -136,7 +148,10 @@
 
         function scheduleRotateFit() {
           clearTimeout(resizeTimer);
-          resizeTimer = setTimeout(updateRotateFit, 50);
+          resizeTimer = setTimeout(function () {
+            syncVideoPreload();
+            updateRotateFit();
+          }, 50);
         }
 
         tryPlay();
