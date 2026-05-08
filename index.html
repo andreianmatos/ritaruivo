@@ -20,11 +20,11 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background: #ffd6e8;
+        background: #d9dade;
         -webkit-tap-highlight-color: transparent;
       }
 
-      /* Viewport = frame; vídeo enche sempre (cover); rosa claro só antes de carregar */
+      /* Viewport = frame; vídeo enche sempre (cover); fundo #d9dade antes do vídeo */
       .stage {
         position: fixed;
         inset: 0;
@@ -32,7 +32,7 @@
         height: 100%;
         overflow: hidden;
         display: block;
-        background: #ffd6e8;
+        background: #d9dade;
       }
 
       .stage__inner {
@@ -83,10 +83,173 @@
         display: block;
         position: absolute;
         inset: 0;
+        z-index: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
         object-position: center;
+      }
+
+      /* Véu + “stardust” suave (cor exata do arranque) enquanto o vídeo ainda não mostra imagem */
+      .stage__stardust {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 4.5s ease-out, visibility 0s linear 4.5s;
+        background-color: #d9dade;
+        /* Textura fina tipo “speckled” (telha repetida + offsets) */
+        background-image: radial-gradient(
+            circle at 50% 50%,
+            rgba(255, 255, 255, 0.2) 0.5px,
+            transparent 0.65px
+          ),
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(72, 74, 86, 0.055) 0.45px,
+            transparent 0.58px
+          ),
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(255, 255, 255, 0.11) 0.4px,
+            transparent 0.52px
+          ),
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(45, 47, 58, 0.04) 0.35px,
+            transparent 0.48px
+          );
+        background-size: 2px 3px, 5px 7px, 4px 5px, 6px 4px;
+        background-position: 0 0, 2px 3px, 3px 1px, 1px 4px;
+        background-repeat: repeat;
+      }
+
+      .stage__stardust.is-hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .stage__stardust::before,
+      .stage__stardust::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+
+      .stage__stardust::before {
+        opacity: 0.42;
+        background-image: radial-gradient(
+            1.5px 1.5px at 7% 14%,
+            rgba(255, 255, 255, 0.42),
+            transparent
+          ),
+          radial-gradient(1px 1px at 19% 62%, rgba(255, 255, 255, 0.38), transparent),
+          radial-gradient(1px 1px at 34% 28%, rgba(255, 248, 235, 0.4), transparent),
+          radial-gradient(1px 1px at 48% 81%, rgba(255, 255, 255, 0.35), transparent),
+          radial-gradient(1.5px 1.5px at 61% 11%, rgba(255, 255, 255, 0.4), transparent),
+          radial-gradient(1px 1px at 73% 55%, rgba(255, 250, 245, 0.36), transparent),
+          radial-gradient(1px 1px at 86% 33%, rgba(255, 255, 255, 0.38), transparent),
+          radial-gradient(1px 1px at 92% 78%, rgba(255, 255, 255, 0.34), transparent),
+          radial-gradient(1px 1px at 15% 88%, rgba(255, 248, 240, 0.4), transparent),
+          radial-gradient(1px 1px at 55% 44%, rgba(255, 255, 255, 0.32), transparent),
+          radial-gradient(1px 1px at 41% 95%, rgba(255, 255, 255, 0.36), transparent),
+          radial-gradient(1px 1px at 78% 19%, rgba(255, 255, 255, 0.34), transparent),
+          radial-gradient(1px 1px at 3% 41%, rgba(255, 255, 255, 0.36), transparent),
+          radial-gradient(1px 1px at 12% 7%, rgba(255, 250, 250, 0.33), transparent),
+          radial-gradient(1.5px 1.5px at 28% 47%, rgba(255, 255, 255, 0.38), transparent),
+          radial-gradient(1px 1px at 52% 6%, rgba(255, 248, 235, 0.34), transparent),
+          radial-gradient(1px 1px at 67% 73%, rgba(255, 255, 255, 0.35), transparent),
+          radial-gradient(1px 1px at 81% 91%, rgba(255, 255, 255, 0.32), transparent),
+          radial-gradient(1px 1px at 96% 24%, rgba(255, 255, 255, 0.36), transparent),
+          radial-gradient(1px 1px at 8% 56%, rgba(255, 255, 255, 0.3), transparent),
+          radial-gradient(1px 1px at 23% 19%, rgba(255, 248, 240, 0.37), transparent),
+          radial-gradient(1px 1px at 39% 68%, rgba(255, 255, 255, 0.34), transparent),
+          radial-gradient(1.5px 1.5px at 44% 36%, rgba(255, 255, 255, 0.39), transparent),
+          radial-gradient(1px 1px at 59% 52%, rgba(255, 250, 245, 0.33), transparent),
+          radial-gradient(1px 1px at 71% 8%, rgba(255, 255, 255, 0.35), transparent),
+          radial-gradient(1px 1px at 84% 64%, rgba(255, 255, 255, 0.31), transparent),
+          radial-gradient(1px 1px at 91% 46%, rgba(255, 255, 255, 0.36), transparent),
+          radial-gradient(1px 1px at 17% 31%, rgba(255, 255, 255, 0.33), transparent),
+          radial-gradient(1px 1px at 63% 29%, rgba(255, 248, 235, 0.35), transparent),
+          radial-gradient(1px 1px at 76% 84%, rgba(255, 255, 255, 0.32), transparent),
+          radial-gradient(1px 1px at 31% 93%, rgba(255, 255, 255, 0.34), transparent),
+          radial-gradient(1px 1px at 50% 59%, rgba(255, 255, 255, 0.3), transparent),
+          radial-gradient(1px 1px at 97% 7%, rgba(255, 250, 250, 0.33), transparent);
+        animation: stardust-twinkle-a 14s ease-in-out infinite;
+      }
+
+      .stage__stardust::after {
+        opacity: 0.32;
+        background-image: radial-gradient(
+            1px 1px at 11% 38%,
+            rgba(255, 255, 255, 0.34),
+            transparent
+          ),
+          radial-gradient(1px 1px at 27% 91%, rgba(255, 255, 255, 0.3), transparent),
+          radial-gradient(1px 1px at 44% 17%, rgba(255, 250, 250, 0.36), transparent),
+          radial-gradient(1px 1px at 58% 66%, rgba(255, 255, 255, 0.32), transparent),
+          radial-gradient(1px 1px at 71% 40%, rgba(255, 255, 255, 0.3), transparent),
+          radial-gradient(1px 1px at 83% 12%, rgba(255, 248, 235, 0.34), transparent),
+          radial-gradient(1px 1px at 95% 58%, rgba(255, 255, 255, 0.32), transparent),
+          radial-gradient(1px 1px at 6% 72%, rgba(255, 255, 255, 0.3), transparent),
+          radial-gradient(1px 1px at 38% 51%, rgba(255, 255, 255, 0.28), transparent),
+          radial-gradient(1px 1px at 66% 88%, rgba(255, 255, 255, 0.34), transparent),
+          radial-gradient(1px 1px at 2% 18%, rgba(255, 255, 255, 0.29), transparent),
+          radial-gradient(1px 1px at 14% 74%, rgba(255, 248, 240, 0.31), transparent),
+          radial-gradient(1px 1px at 33% 8%, rgba(255, 255, 255, 0.33), transparent),
+          radial-gradient(1px 1px at 47% 42%, rgba(255, 255, 255, 0.27), transparent),
+          radial-gradient(1px 1px at 54% 23%, rgba(255, 250, 245, 0.32), transparent),
+          radial-gradient(1px 1px at 69% 61%, rgba(255, 255, 255, 0.3), transparent),
+          radial-gradient(1px 1px at 79% 37%, rgba(255, 255, 255, 0.28), transparent),
+          radial-gradient(1px 1px at 88% 95%, rgba(255, 255, 255, 0.31), transparent),
+          radial-gradient(1px 1px at 99% 83%, rgba(255, 248, 235, 0.29), transparent),
+          radial-gradient(1px 1px at 21% 52%, rgba(255, 255, 255, 0.3), transparent),
+          radial-gradient(1px 1px at 36% 77%, rgba(255, 255, 255, 0.26), transparent),
+          radial-gradient(1px 1px at 61% 18%, rgba(255, 255, 255, 0.32), transparent),
+          radial-gradient(1px 1px at 72% 96%, rgba(255, 250, 250, 0.28), transparent),
+          radial-gradient(1px 1px at 42% 14%, rgba(255, 255, 255, 0.31), transparent),
+          radial-gradient(1px 1px at 56% 89%, rgba(255, 255, 255, 0.29), transparent),
+          radial-gradient(1px 1px at 18% 96%, rgba(255, 255, 255, 0.27), transparent),
+          radial-gradient(1px 1px at 49% 71%, rgba(255, 255, 255, 0.3), transparent),
+          radial-gradient(1px 1px at 93% 39%, rgba(255, 248, 235, 0.28), transparent),
+          radial-gradient(1px 1px at 25% 3%, rgba(255, 255, 255, 0.31), transparent),
+          radial-gradient(1px 1px at 64% 46%, rgba(255, 255, 255, 0.27), transparent),
+          radial-gradient(1px 1px at 85% 76%, rgba(255, 255, 255, 0.3), transparent),
+          radial-gradient(1px 1px at 9% 27%, rgba(255, 255, 255, 0.28), transparent),
+          radial-gradient(1px 1px at 74% 14%, rgba(255, 255, 255, 0.29), transparent);
+        animation: stardust-twinkle-b 18s ease-in-out infinite;
+      }
+
+      @keyframes stardust-twinkle-a {
+        0%,
+        100% {
+          opacity: 0.65;
+        }
+        50% {
+          opacity: 0.88;
+        }
+      }
+
+      @keyframes stardust-twinkle-b {
+        0%,
+        100% {
+          opacity: 0.58;
+        }
+        45% {
+          opacity: 0.82;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .stage__stardust::before,
+        .stage__stardust::after {
+          animation: none;
+          opacity: 0.55;
+        }
       }
     </style>
   </head>
@@ -100,27 +263,21 @@
           muted
           loop
           playsinline
-          preload="metadata"
+          preload="auto"
         ></video>
+        <div
+          class="stage__stardust"
+          id="stardust"
+          aria-hidden="true"
+        ></div>
       </div>
     </div>
     <script>
       (function () {
         var v = document.getElementById("portfolio");
         var stage = document.getElementById("stage");
+        var stardust = document.getElementById("stardust");
         var resizeTimer;
-        var mobilePreloadMq = window.matchMedia("(max-width: 768px)");
-
-        function syncVideoPreload() {
-          v.preload = mobilePreloadMq.matches ? "metadata" : "auto";
-        }
-
-        syncVideoPreload();
-        if (typeof mobilePreloadMq.addEventListener === "function") {
-          mobilePreloadMq.addEventListener("change", syncVideoPreload);
-        } else if (typeof mobilePreloadMq.addListener === "function") {
-          mobilePreloadMq.addListener(syncVideoPreload);
-        }
 
         function tryPlay() {
           var p = v.play();
@@ -128,6 +285,12 @@
             p.catch(function () {});
           }
         }
+
+        function hideStardust() {
+          if (stardust) stardust.classList.add("is-hidden");
+        }
+
+        v.addEventListener("playing", hideStardust, { once: true });
 
         function updateRotateFit() {
           var vw = window.innerWidth;
@@ -148,10 +311,7 @@
 
         function scheduleRotateFit() {
           clearTimeout(resizeTimer);
-          resizeTimer = setTimeout(function () {
-            syncVideoPreload();
-            updateRotateFit();
-          }, 50);
+          resizeTimer = setTimeout(updateRotateFit, 50);
         }
 
         tryPlay();
