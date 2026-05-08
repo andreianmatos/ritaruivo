@@ -98,7 +98,6 @@
         pointer-events: none;
         opacity: 1;
         visibility: visible;
-        transition: opacity 4.5s ease-out, visibility 0s linear 4.5s;
         background-color: #d9dade;
         /* Textura fina tipo “speckled” (telha repetida + offsets) */
         background-image: radial-gradient(
@@ -129,11 +128,6 @@
       .stage__stardust.is-hidden {
         opacity: 0;
         visibility: hidden;
-      }
-
-      /* Fade mais curto em cada volta do vídeo */
-      .stage__stardust.is-loop {
-        transition: opacity 0.85s ease-in-out, visibility 0s linear 0.85s;
       }
 
       .stage__stardust::before,
@@ -267,6 +261,7 @@
           src="portfoliocompress.mp4"
           autoplay
           muted
+          loop
           playsinline
           preload="auto"
         ></video>
@@ -283,9 +278,6 @@
         var stage = document.getElementById("stage");
         var stardust = document.getElementById("stardust");
         var resizeTimer;
-        var isFirstPlay = true;
-        var loopStardustArmed = false;
-        var LOOP_STARDUST_LEAD = 0.9;
 
         function tryPlay() {
           var p = v.play();
@@ -295,32 +287,8 @@
         }
 
         v.addEventListener("playing", function () {
-          if (!stardust) return;
-          if (isFirstPlay) {
-            isFirstPlay = false;
-            stardust.classList.remove("is-loop");
-            loopStardustArmed = true;
-          } else {
-            stardust.classList.add("is-loop");
-          }
-          stardust.classList.add("is-hidden");
-        });
-
-        v.addEventListener("timeupdate", function () {
-          if (!stardust || isFirstPlay || !v.duration) return;
-          var left = v.duration - v.currentTime;
-          if (left <= LOOP_STARDUST_LEAD && loopStardustArmed) {
-            loopStardustArmed = false;
-            stardust.classList.add("is-loop");
-            stardust.classList.remove("is-hidden");
-          }
-        });
-
-        v.addEventListener("ended", function () {
-          loopStardustArmed = true;
-          v.currentTime = 0;
-          tryPlay();
-        });
+          if (stardust) stardust.classList.add("is-hidden");
+        }, { once: true });
 
         function updateRotateFit() {
           var vw = window.innerWidth;
