@@ -263,6 +263,7 @@
           muted
           loop
           playsinline
+          webkit-playsinline
           preload="auto"
         ></video>
         <div
@@ -278,6 +279,14 @@
         var stage = document.getElementById("stage");
         var stardust = document.getElementById("stardust");
         var resizeTimer;
+        var stardustHidden = false;
+
+        /* iPhone / iOS WebKit: reinforce inline + muted autoplay */
+        v.muted = true;
+        v.defaultMuted = true;
+        v.playsInline = true;
+        v.setAttribute("playsinline", "");
+        v.setAttribute("webkit-playsinline", "");
 
         function tryPlay() {
           var p = v.play();
@@ -286,9 +295,24 @@
           }
         }
 
-        v.addEventListener("playing", function () {
-          if (stardust) stardust.classList.add("is-hidden");
-        }, { once: true });
+        function hideStardustOnce() {
+          if (stardustHidden || !stardust) return;
+          stardustHidden = true;
+          stardust.classList.add("is-hidden");
+        }
+
+        v.addEventListener("playing", hideStardustOnce);
+        /* Fallback: some iOS builds advance currentTime without firing playing first */
+        v.addEventListener(
+          "timeupdate",
+          function onFirstFrame() {
+            if (v.currentTime > 0.02 && !v.paused) {
+              hideStardustOnce();
+              v.removeEventListener("timeupdate", onFirstFrame);
+            }
+          },
+          false
+        );
 
         function updateRotateFit() {
           var vw = window.innerWidth;
