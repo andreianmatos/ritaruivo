@@ -255,10 +255,9 @@
   <body>
     <div class="stage" id="stage">
       <div class="stage__inner">
-        <!-- R2 (alternativa): https://pub-3b011c7ca5eb4317a6f3513a80528592.r2.dev/portfolio-faststart.mp4 -->
         <video
           id="portfolio"
-          src="portfolio_rita_ruivo_1080p50.mp4"
+          src="https://pub-3b011c7ca5eb4317a6f3513a80528592.r2.dev/ritaruivo/portfolio_rita_ruivo_1080p50.mp4"
           autoplay
           muted
           loop
@@ -337,7 +336,8 @@
         }
 
         tryPlay();
-        v.addEventListener("loadeddata", tryPlay, { once: true });
+        v.addEventListener("loadeddata", tryPlay);
+        v.addEventListener("canplay", tryPlay);
         v.addEventListener("loadedmetadata", function () {
           updateRotateFit();
           tryPlay();
