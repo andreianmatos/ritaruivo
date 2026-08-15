@@ -7,6 +7,7 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <title>Rita Ruivo</title>
+    <link rel="preload" href="poster.jpg" as="image" />
     <style>
       *,
       *::before,
@@ -257,8 +258,7 @@
       <div class="stage__inner">
         <video
           id="portfolio"
-          src="https://pub-3b011c7ca5eb4317a6f3513a80528592.r2.dev/ritaruivo/portfolio_rita_ruivo_1080p50.mp4"
-          autoplay
+          poster="poster.jpg"
           muted
           loop
           playsinline
@@ -274,11 +274,14 @@
     </div>
     <script>
       (function () {
+        var VIDEO_URL =
+          "https://pub-3b011c7ca5eb4317a6f3513a80528592.r2.dev/portfolio_rita_ruivo_1080p50.mp4";
         var v = document.getElementById("portfolio");
         var stage = document.getElementById("stage");
         var stardust = document.getElementById("stardust");
         var resizeTimer;
         var stardustHidden = false;
+        var canPlay = false;
 
         /* iPhone / iOS WebKit: reinforce inline + muted autoplay */
         v.muted = true;
@@ -288,6 +291,7 @@
         v.setAttribute("webkit-playsinline", "");
 
         function tryPlay() {
+          if (!canPlay) return;
           var p = v.play();
           if (p && typeof p.catch === "function") {
             p.catch(function () {});
@@ -300,25 +304,48 @@
           stardust.classList.add("is-hidden");
         }
 
+        function isFullyBuffered() {
+          var d = v.duration;
+          if (!d || !isFinite(d)) return false;
+          var b = v.buffered;
+          var i;
+          for (i = 0; i < b.length; i++) {
+            if (b.start(i) <= 0.25 && b.end(i) >= d - 0.35) return true;
+          }
+          return false;
+        }
+
+        function markReady() {
+          if (canPlay) return;
+          canPlay = true;
+          updateRotateFit();
+          tryPlay();
+        }
+
+        function holdFirstFrame() {
+          hideStardustOnce();
+          if (canPlay) return;
+          v.pause();
+          if (v.currentTime > 0.05) v.currentTime = 0;
+        }
+
+        /* Poster = first frame, visible immediately while the MP4 loads */
+        var poster = new Image();
+        poster.onload = function () {
+          hideStardustOnce();
+          updateRotateFit();
+        };
+        poster.src = "poster.jpg";
+
+        v.addEventListener("loadeddata", holdFirstFrame);
         v.addEventListener("playing", hideStardustOnce);
-        /* Fallback: some iOS builds advance currentTime without firing playing first */
-        v.addEventListener(
-          "timeupdate",
-          function onFirstFrame() {
-            if (v.currentTime > 0.02 && !v.paused) {
-              hideStardustOnce();
-              v.removeEventListener("timeupdate", onFirstFrame);
-            }
-          },
-          false
-        );
 
         function updateRotateFit() {
           var vw = window.innerWidth;
           var vh = window.innerHeight;
-          var iw = v.videoWidth;
-          var ih = v.videoHeight;
-          if (!iw || !ih || !vw || !vh) return;
+          var iw = v.videoWidth || 1920;
+          var ih = v.videoHeight || 1080;
+          if (!vw || !vh) return;
           var tallScreen = vh > vw;
           var wideScreen = vw > vh;
           var landscapeVideo = iw > ih;
@@ -335,13 +362,36 @@
           resizeTimer = setTimeout(updateRotateFit, 50);
         }
 
-        tryPlay();
-        v.addEventListener("loadeddata", tryPlay);
-        v.addEventListener("canplay", tryPlay);
-        v.addEventListener("loadedmetadata", function () {
-          updateRotateFit();
-          tryPlay();
-        });
+        function waitForFullBuffer() {
+          function check() {
+            if (isFullyBuffered()) markReady();
+          }
+          v.addEventListener("progress", check);
+          v.addEventListener("canplaythrough", check);
+          v.addEventListener("loadeddata", check);
+          check();
+        }
+
+        function streamFromUrl() {
+          v.src = VIDEO_URL;
+          v.load();
+          waitForFullBuffer();
+        }
+
+        fetch(VIDEO_URL, { mode: "cors", credentials: "omit" })
+          .then(function (res) {
+            if (!res.ok) throw new Error("r2");
+            return res.blob();
+          })
+          .then(function (blob) {
+            v.src = URL.createObjectURL(blob);
+            v.load();
+            v.addEventListener("loadeddata", markReady, { once: true });
+          })
+          .catch(streamFromUrl);
+
+        v.addEventListener("loadedmetadata", updateRotateFit);
+        updateRotateFit();
 
         window.addEventListener("resize", scheduleRotateFit);
         window.addEventListener("orientationchange", function () {
