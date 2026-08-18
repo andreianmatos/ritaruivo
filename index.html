@@ -275,8 +275,7 @@
     <script>
       (function () {
         var VIDEO_URL =
-          "https://pub-3b011c7ca5eb4317a6f3513a80528592.r2.dev/portfolio_rita_ruivo_1080p50.mp4";
-        var START_AT = 3;
+          "https://pub-3b011c7ca5eb4317a6f3513a80528592.r2.dev/portfolio_rita_ruivo_1080p50_compress.mp4";
         var v = document.getElementById("portfolio");
         var stage = document.getElementById("stage");
         var stardust = document.getElementById("stardust");
@@ -297,21 +296,6 @@
           if (p && typeof p.catch === "function") {
             p.catch(function () {});
           }
-        }
-
-        function seekToStart(thenPlay) {
-          function onSeeked() {
-            v.removeEventListener("seeked", onSeeked);
-            if (thenPlay) tryPlay();
-          }
-          if (Math.abs(v.currentTime - START_AT) < 0.08) {
-            if (thenPlay) tryPlay();
-            return;
-          }
-          v.addEventListener("seeked", onSeeked);
-          try {
-            v.currentTime = START_AT;
-          } catch (err) {}
         }
 
         function hideStardustOnce() {
@@ -335,25 +319,17 @@
           if (canPlay) return;
           canPlay = true;
           updateRotateFit();
-          seekToStart(true);
+          tryPlay();
         }
 
-        function holdFirstFrame() {
-          hideStardustOnce();
-          if (canPlay) return;
-          v.pause();
-          seekToStart(false);
-        }
-
-        /* Poster = first frame, visible immediately while the MP4 loads */
+        /* Poster stays up only while the file is not here yet */
         var poster = new Image();
         poster.onload = function () {
-          hideStardustOnce();
+          if (!canPlay) hideStardustOnce();
           updateRotateFit();
         };
         poster.src = "poster.jpg";
 
-        v.addEventListener("loadeddata", holdFirstFrame);
         v.addEventListener("playing", hideStardustOnce);
 
         function updateRotateFit() {
